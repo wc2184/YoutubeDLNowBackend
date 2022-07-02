@@ -5,7 +5,7 @@ const downloadsFolder = require("downloads-folder");
 var cors = require("cors");
 const app = express();
 
-app.use(cors());
+app.use(cors({ credentials: true, origin: true }));
 let PORT = process.env.PORT || 5000;
 
 // TypeScript: import ytdl from 'ytdl-core'; with --esModuleInterop
@@ -24,7 +24,7 @@ app.get("/download", (req, res) => {
   console.log("download ran");
   let title;
   let videolink = req.query.link;
-  console.log(videolink);
+  console.log(videolink, "this is the link");
   let file = fs.createWriteStream("thevideo.mp4");
   ytdl(videolink).pipe(file);
   ytdl.getInfo(videolink).then((data) => {
@@ -42,6 +42,12 @@ app.get("/download", (req, res) => {
     // });
     // res.send("Downloaded!");
     title.replace(" ", "_");
+    res.attachment(`${title}.mp4`);
+    res.set("Access-Control-Expose-Headers", "Content-Disposition");
+    res.set("Content-Disposition", `attachment;  ${title}.mp4`);
+    console.log(JSON.stringify(res.headers));
+    console.log(res, "response");
+    console.log(res.getHeaders(), "response");
     res.download("thevideo.mp4", `${title}.mp4`);
   });
 });
