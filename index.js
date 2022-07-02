@@ -1,8 +1,11 @@
 const express = require("express");
-const app = express();
 const fs = require("fs");
 const ytdl = require("ytdl-core");
 const downloadsFolder = require("downloads-folder");
+var cors = require("cors");
+const app = express();
+
+app.use(cors());
 let PORT = process.env.PORT || 5000;
 
 // TypeScript: import ytdl from 'ytdl-core'; with --esModuleInterop
