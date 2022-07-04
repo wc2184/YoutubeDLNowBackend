@@ -8,7 +8,7 @@ const app = express();
 app.use(cors({ credentials: true, origin: true }));
 let PORT = process.env.PORT || 5000;
 
-server.on("uncaughtException", function (req, res, route, err) {
+app.on("uncaughtException", function (req, res, route, err) {
   log.info(
     "******* Begin Error *******\n%s\n*******\n%s\n******* End Error *******",
     route,
