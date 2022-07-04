@@ -43,7 +43,8 @@ app.get("/download", (req, res) => {
     )
   ) {
     console.log("Not a valid Youtube Link");
-    res.send(500, { ok: false });
+    res.send(500).send{ ok: false };
+    return;
   }
 
   console.log(videolink, "this is the link");
