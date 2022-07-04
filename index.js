@@ -5,9 +5,6 @@ const downloadsFolder = require("downloads-folder");
 var cors = require("cors");
 const app = express();
 
-app.use(cors({ credentials: true, origin: true }));
-let PORT = process.env.PORT || 5000;
-
 app.on("uncaughtException", function (req, res, route, err) {
   log.info(
     "******* Begin Error *******\n%s\n*******\n%s\n******* End Error *******",
@@ -20,6 +17,9 @@ app.on("uncaughtException", function (req, res, route, err) {
   res.write("\n");
   res.end();
 });
+
+app.use(cors({ credentials: true, origin: true }));
+let PORT = process.env.PORT || 5000;
 
 // TypeScript: import ytdl from 'ytdl-core'; with --esModuleInterop
 // TypeScript: import * as ytdl from 'ytdl-core'; with --allowSyntheticDefaultImports
@@ -39,7 +39,9 @@ app.get("/download", (req, res) => {
     let title;
     let videolink = req.query.link;
     console.log(videolink, "this is the link");
+
     let file = fs.createWriteStream("thevideo.mp4");
+
     ytdl(videolink).pipe(file);
     ytdl.getInfo(videolink).then((data) => {
       console.log(data.videoDetails.title);
