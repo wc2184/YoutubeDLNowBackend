@@ -37,11 +37,7 @@ app.get("/download", (req, res) => {
   console.log("download ran");
   let title;
   let videolink = req.query.link;
-  if (
-    !/^(?:https?:\/\/)?(?:(?:www\.)?youtube.com\/watch\?v=|youtu.be\/)(\w+)$/.test(
-      videolink
-    )
-  ) {
+  if (!/(youtube.com|youtu.be)\/(watch)?(\?v=)?(\S+)?/.test(videolink)) {
     console.log("Not a valid Youtube Link");
     res.send(500).send({ ok: false });
     return;
