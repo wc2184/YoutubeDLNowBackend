@@ -8,13 +8,26 @@ const app = express();
 app.use(cors({ credentials: true, origin: true }));
 let PORT = process.env.PORT || 5000;
 
+server.on("uncaughtException", function (req, res, route, err) {
+  log.info(
+    "******* Begin Error *******\n%s\n*******\n%s\n******* End Error *******",
+    route,
+    err.stack
+  );
+  if (!res.headersSent) {
+    return res.send(500, { ok: false });
+  }
+  res.write("\n");
+  res.end();
+});
+
 // TypeScript: import ytdl from 'ytdl-core'; with --esModuleInterop
 // TypeScript: import * as ytdl from 'ytdl-core'; with --allowSyntheticDefaultImports
 // TypeScript: import ytdl = require('ytdl-core'); with neither of the above
 
-ytdl("http://www.youtube.com/watch?v=aqz-KE-bpKQ").pipe(
-  fs.createWriteStream("video.mp4")
-);
+// ytdl("http://www.youtube.com/watch?v=aqz-KE-bpKQ").pipe(
+//   fs.createWriteStream("video.mp4")
+// );
 // app.get("/", (req, res) => {
 //   const user = req.query.user;
 //   res.send(user + "is what you typed");
