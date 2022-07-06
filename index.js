@@ -89,7 +89,7 @@ app.get("/download", (req, res) => {
     console.log(res.getHeaders(), "response");
     res.download("thevideo.mp4", `${title}.mp4`);
   });
-  res.sendStatus(500);
+  //   res.sendStatus(500);
 });
 
 app.listen(PORT, () => {
