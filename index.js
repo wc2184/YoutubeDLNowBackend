@@ -46,7 +46,13 @@ app.get("/download", (req, res) => {
   console.log(videolink, "this is the link");
 
   let file = fs.createWriteStream("thevideo.mp4");
-
+  file.on("error", function (err) {
+    console.log(err);
+    file.end();
+    console.log("Stopping your thing");
+    res.send(500).send({ ok: false });
+    return;
+  });
   ytdl(videolink).pipe(file);
   ytdl.getInfo(videolink).then((data) => {
     console.log(data.videoDetails.title);
