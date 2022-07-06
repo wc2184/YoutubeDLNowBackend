@@ -59,14 +59,17 @@ app.get("/download", (req, res) => {
       console.log(err, "caught da error");
       console.log("end it now");
       res.header("ok", "false");
-      res.send(500);
+      res.sendStatus(500);
       return;
     })
     .pipe(file);
-  ytdl.getInfo(videolink).then((data) => {
-    console.log(data.videoDetails.title);
-    title = data.videoDetails.title;
-  });
+  ytdl
+    .getInfo(videolink)
+    .then((data) => {
+      console.log(data.videoDetails.title);
+      title = data.videoDetails.title;
+    })
+    .catch((err) => console.log(err, "in the get info error"));
   //   http://localhost:5000/download?link=https://www.youtube.com/watch?v=AuO0Y8Iwq0E
 
   //   console.log(downloadsFolder());
@@ -86,6 +89,7 @@ app.get("/download", (req, res) => {
     console.log(res.getHeaders(), "response");
     res.download("thevideo.mp4", `${title}.mp4`);
   });
+  res.sendStatus(500);
 });
 
 app.listen(PORT, () => {
