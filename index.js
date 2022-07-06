@@ -53,15 +53,23 @@ app.get("/download", (req, res) => {
     res.send(500).send({ ok: false });
     return;
   });
-  ytdl(videolink).pipe(file);
+  //s
+  ytdl(videolink)
+    .on("error", (err) => {
+      console.log(err, "caught da error");
+      console.log("end it now");
+      res.send(500).send({ ok: false });
+      return;
+    })
+    .pipe(file);
   ytdl.getInfo(videolink).then((data) => {
     console.log(data.videoDetails.title);
     title = data.videoDetails.title;
   });
   //   http://localhost:5000/download?link=https://www.youtube.com/watch?v=AuO0Y8Iwq0E
 
-  console.log(downloadsFolder());
-  location = downloadsFolder();
+  //   console.log(downloadsFolder());
+  //   location = downloadsFolder();
   file.on("finish", () => {
     // fs.writeFile(location, file, function callback(err) {
     //   if (err) throw err;
