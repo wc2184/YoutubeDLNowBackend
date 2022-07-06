@@ -58,7 +58,8 @@ app.get("/download", (req, res) => {
     .on("error", (err) => {
       console.log(err, "caught da error");
       console.log("end it now");
-      res.send(500).send({ ok: false });
+      res.header("ok", "false");
+      res.send(500);
       return;
     })
     .pipe(file);
