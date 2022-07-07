@@ -3,6 +3,8 @@ const fs = require("fs");
 const ytdl = require("ytdl-core");
 const downloadsFolder = require("downloads-folder");
 var cors = require("cors");
+const ytpl = require("ytpl");
+
 const app = express();
 
 app.on("uncaughtException", function (req, res, route, err) {
@@ -32,6 +34,12 @@ let PORT = process.env.PORT || 5000;
 //   const user = req.query.user;
 //   res.send(user + "is what you typed");
 // });
+function youtube_parser(url) {
+  var regExp =
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  var match = url.match(regExp);
+  return match && match[7].length == 11 ? match[7] : false;
+}
 
 app.get("/download", (req, res) => {
   console.log("download ran");
@@ -44,8 +52,8 @@ app.get("/download", (req, res) => {
   }
 
   console.log(videolink, "this is the link");
-
-  let file = fs.createWriteStream("thevideo.mp4");
+  let filenames = youtube_parser(videolink) + ".mp4";
+  let file = fs.createWriteStream(filenames);
   file.on("error", function (err) {
     console.log(err);
     file.end();
@@ -84,12 +92,34 @@ app.get("/download", (req, res) => {
     res.attachment(`${title}.mp4`);
     res.set("Access-Control-Expose-Headers", "Content-Disposition");
     res.set("Content-Disposition", `attachment;  ${title}.mp4`);
-    console.log(JSON.stringify(res.headers));
-    console.log(res, "response");
+    // console.log(JSON.stringify(res.headers));
+    // console.log(res, "response");
     console.log(res.getHeaders(), "response");
-    res.download("thevideo.mp4", `${title}.mp4`);
+    res.download(filenames, `${title}.mp4`);
   });
   //   res.sendStatus(500);
+});
+// just make another api request with the playlist download, use react front end to parse the playlist
+// put everything into a file, and zip/compress that file
+
+app.get("/playlist", (req, res) => {
+  console.log(req.query.link);
+  res.send(req.query.link);
+  let playlist = req.query.link.split("list=")[1];
+  console.log(playlist ? "yes" : "undefinedddd daddy");
+  if (playlist) return res.end();
+  console.log(playlist, "playlist");
+  ytpl("PLD7SPvDoEddZUrho5ynsBfaI7nqhaNN5c")
+    .then((res) => {
+      // console.log(res.items);
+      console.log(res.items.length);
+      res.items.forEach((item) => {
+        console.log(item.title);
+        console.log(item.shortUrl);
+        console.log("-------");
+      });
+    })
+    .catch((err) => console.log(err, "err playlist"));
 });
 
 app.listen(PORT, () => {
