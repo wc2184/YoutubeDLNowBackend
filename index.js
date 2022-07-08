@@ -110,10 +110,13 @@ app.get("/playlist", (req, res) => {
   if (playlist) return res.end();
   console.log(playlist, "playlist");
   ytpl("PLD7SPvDoEddZUrho5ynsBfaI7nqhaNN5c")
-    .then((res) => {
+    .then(async (res) => {
       // console.log(res.items);
+      await fs.mkdir("./playlists/hello", (err) => console.log(err));
+
       console.log(res.items.length);
       res.items.forEach((item) => {
+        fs.createWriteStream(`./playlists/${item.title}.mp4`);
         console.log(item.title);
         console.log(item.shortUrl);
         console.log("-------");
