@@ -102,7 +102,7 @@ app.get("/download/:type", (req, res) => {
     let start = Date.now();
     if (type == "audio") {
       console.log("yes its audio", __dirname);
-      ffmpeg("./4boXExbbGCk.mp4")
+      ffmpeg("./" + youtube_parser(videolink) + ".mp4")
         .audioBitrate(128)
         .save(`./${youtube_parser(videolink)}.mp3`)
         .on("progress", (p) => {
