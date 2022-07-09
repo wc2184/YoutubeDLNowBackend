@@ -118,7 +118,9 @@ app.get("/playlist/:type", (req, res) => {
   ytpl(playlist)
     .then(async (data) => {
       // console.log(res.items);
-      await fs.mkdir(`./playlists/${playlist}`, (err) => console.log(err));
+      await fs.mkdir(`${__dirname}/playlists/${playlist}`, (err) =>
+        console.log(err)
+      );
 
       console.log(data.items.length);
       let counter = 0;
