@@ -45,8 +45,8 @@ function youtube_parser(url) {
   return match && match[7].length == 11 ? match[7] : false;
 }
 
-app.get("/download:type", (req, res) => {
-  console.log("download ran");
+app.get("/download/:type", (req, res) => {
+  console.log("download rann");
   console.log(req.params.type, "is the type");
   let title;
   let videolink = req.query.link;
