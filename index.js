@@ -146,6 +146,7 @@ app.get("/playlist/:type", (req, res) => {
         // .pipe(file); // if video then add this
         let start = Date.now();
         if (type == "audio") {
+          console.log("yes its audio");
           ffmpeg(yt)
             .audioBitrate(128)
             .save(`${__dirname}/playlists/${playlist}/${item.title}.mp3`)
