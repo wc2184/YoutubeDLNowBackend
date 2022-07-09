@@ -126,7 +126,7 @@ app.get("/playlist/:type", (req, res) => {
       let counter = 0;
       data.items.forEach((item) => {
         let file = fs.createWriteStream(
-          `./playlists/${playlist}/${item.title}.mp4`
+          `${__dirname}/playlists/${playlist}/${item.title}.mp4`
         );
         console.log(item.title);
         console.log(item.shortUrl);
@@ -206,11 +206,11 @@ app.get("/playlist/:type", (req, res) => {
           clearInterval(clear);
           console.log("done");
           zipper.sync
-            .zip(`./playlists/${playlist}`)
-            .save(`./playlists/${playlist}.zip`);
+            .zip(`${__dirname}/playlists/${playlist}`)
+            .save(`${__dirname}/playlists/${playlist}.zip`);
           setTimeout(() => {
             res.download(
-              `./playlists/${playlist}.zip`,
+              `${__dirname}/playlists/${playlist}.zip`,
               "youtubefolder.zip",
               function (err) {
                 if (err) {
