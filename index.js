@@ -45,8 +45,9 @@ function youtube_parser(url) {
   return match && match[7].length == 11 ? match[7] : false;
 }
 
-app.get("/download", (req, res) => {
+app.get("/download:type", (req, res) => {
   console.log("download ran");
+  console.log(req.params.type, "is the type");
   let title;
   let videolink = req.query.link;
   if (!/(youtube.com|youtu.be)\/(watch)?(\?v=)?(\S+)?/.test(videolink)) {
@@ -98,7 +99,7 @@ app.get("/download", (req, res) => {
     res.set("Content-Disposition", `attachment;  ${title}.mp4`);
     // console.log(JSON.stringify(res.headers));
     // console.log(res, "response");
-    console.log(res.getHeaders(), "response");
+    // console.log(res.getHeaders(), "response");
     res.download(filenames, `${title}.mp4`);
   });
   //   res.sendStatus(500);
