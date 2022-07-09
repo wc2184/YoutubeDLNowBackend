@@ -48,6 +48,7 @@ function youtube_parser(url) {
 app.get("/download/:type", (req, res) => {
   console.log("download rann");
   console.log(req.params.type, "is the type");
+  let type = req.params.type;
   let title;
   let videolink = req.query.link;
   if (!/(youtube.com|youtu.be)\/(watch)?(\?v=)?(\S+)?/.test(videolink)) {
@@ -98,14 +99,42 @@ app.get("/download/:type", (req, res) => {
     //   console.log(downloaded);
     // });
     // res.send("Downloaded!");
-    title.replace(" ", "_");
-    res.attachment(`${title}.mp4`);
-    res.set("Access-Control-Expose-Headers", "Content-Disposition");
-    res.set("Content-Disposition", `attachment;  ${title}.mp4`);
-    // console.log(JSON.stringify(res.headers));
-    // console.log(res, "response");
-    // console.log(res.getHeaders(), "response");
-    res.download(filenames, `${title}.mp4`);
+    let start = Date.now();
+    if (type == "audio") {
+      console.log("yes its audio", __dirname);
+      ffmpeg("./4boXExbbGCk.mp4")
+        .audioBitrate(128)
+        .save(`./${youtube_parser(videolink)}.mp3`)
+        .on("progress", (p) => {
+          // readline.cursorTo(process.stdout, 0);
+          process.stdout.write(`${p.targetSize}kb downloaded`);
+        })
+        .on("end", () => {
+          console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
+          // fs.unlinkSync(`${__dirname}/playlists/${playlist}/${item.title}.mp4`);
+          console.log("converted to mp3");
+          // counter++;
+          // console.log(counter);
+          title.replace(" ", "_");
+          res.attachment(`${title}.mp4`);
+          res.set("Access-Control-Expose-Headers", "Content-Disposition");
+          res.set("Content-Disposition", `attachment;  ${title}.mp3`);
+          // console.log(JSON.stringify(res.headers));
+          // console.log(res, "response");
+          // console.log(res.getHeaders(), "response");
+          res.download(`./${youtube_parser(videolink)}.mp3`, `${title}.mp3`);
+        });
+    } else {
+      // yt.pipe(file);
+      title.replace(" ", "_");
+      res.attachment(`${title}.mp4`);
+      res.set("Access-Control-Expose-Headers", "Content-Disposition");
+      res.set("Content-Disposition", `attachment;  ${title}.mp4`);
+      // console.log(JSON.stringify(res.headers));
+      // console.log(res, "response");
+      // console.log(res.getHeaders(), "response");
+      res.download(filenames, `${title}.mp4`);
+    }
   });
   //   res.sendStatus(500);
 });
