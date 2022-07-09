@@ -67,7 +67,12 @@ app.get("/download/:type", (req, res) => {
     return;
   });
   //s
-  ytdl(videolink)
+  let options = {};
+  if (req.params.type == "audio") {
+    options = { filter: "audioonly" };
+    console.log("ran the audio!");
+  }
+  ytdl(videolink, options)
     .on("error", (err) => {
       console.log(err, "caught da error");
       console.log("end it now");
