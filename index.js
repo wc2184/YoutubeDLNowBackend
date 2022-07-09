@@ -156,7 +156,9 @@ app.get("/playlist/:type", (req, res) => {
             })
             .on("end", () => {
               console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
-              fs.unlinkSync(`./playlists/${playlist}/${item.title}.mp4`);
+              fs.unlinkSync(
+                `${__dirname}/playlists/${playlist}/${item.title}.mp4`
+              );
               console.log("converted to mp3");
               counter++;
               console.log(counter);
