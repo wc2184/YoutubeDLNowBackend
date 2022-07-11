@@ -45,6 +45,63 @@ function youtube_parser(url) {
   return match && match[7].length == 11 ? match[7] : false;
 }
 
+app.get("/audiotrial", (req, res) => {
+  console.log("download rann");
+  console.log(req.params.type, "is the type");
+  let type = req.params.type;
+  let title;
+  let videolink = req.query.link;
+  if (!/(youtube.com|youtu.be)\/(watch)?(\?v=)?(\S+)?/.test(videolink)) {
+    console.log("Not a valid Youtube Link");
+    res.send(500).send({ ok: false });
+    return;
+  }
+
+  console.log(videolink, "this is the link");
+  let filenames = youtube_parser(videolink) + ".mp4";
+  let file = fs.createWriteStream(filenames);
+  file.on("error", function (err) {
+    console.log(err);
+    file.end();
+    console.log("Stopping your thing");
+    res.send(500).send({ ok: false });
+    return;
+  });
+  //s
+  // let options = { filter: "audioonly", format: "webm" };
+  let options = {};
+
+  ytdl(videolink, options)
+    .on("error", (err) => {
+      console.log(err, "caught da error");
+      console.log("end it now");
+      res.header("ok", "false");
+      res.sendStatus(500);
+      return;
+    })
+    .pipe(file);
+  ytdl
+    .getInfo(videolink)
+    .then((data) => {
+      console.log(data.videoDetails.title);
+      title = data.videoDetails.title;
+    })
+    .catch((err) => console.log(err, "in the get info error"));
+  //   http://localhost:5000/download?link=https://www.youtube.com/watch?v=AuO0Y8Iwq0E
+
+  //   console.log(downloadsFolder());
+  //   location = downloadsFolder();
+  file.on("finish", () => {
+    // fs.writeFile(location, file, function callback(err) {
+    //   if (err) throw err;
+    //   console.log(downloaded);
+    // });
+    // res.send("Downloaded!");
+
+    res.download(`./${youtube_parser(videolink)}.mp4`, `${title}.m4a`);
+  });
+});
+
 app.get("/download/:type", (req, res) => {
   console.log("download rann");
   console.log(req.params.type, "is the type");
@@ -69,10 +126,10 @@ app.get("/download/:type", (req, res) => {
   });
   //s
   let options = {};
-  if (req.params.type == "audio") {
-    options = { filter: "audioonly" };
-    console.log("ran the audio!");
-  }
+  // if (req.params.type == "audio") {
+  //   options = { filter: "audioonly" };
+  //   console.log("ran the audio!");
+  // }
   ytdl(videolink, options)
     .on("error", (err) => {
       console.log(err, "caught da error");
@@ -101,29 +158,38 @@ app.get("/download/:type", (req, res) => {
     // res.send("Downloaded!");
     let start = Date.now();
     if (type == "audio") {
-      console.log("yes its audio", __dirname);
-      ffmpeg("./" + youtube_parser(videolink) + ".mp4")
-        .audioBitrate(128)
-        .save(`./${youtube_parser(videolink)}.mp3`)
-        .on("progress", (p) => {
-          // readline.cursorTo(process.stdout, 0);
-          process.stdout.write(`${p.targetSize}kb downloaded`);
-        })
-        .on("end", () => {
-          console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
-          // fs.unlinkSync(`${__dirname}/playlists/${playlist}/${item.title}.mp4`);
-          console.log("converted to mp3");
-          // counter++;
-          // console.log(counter);
-          title.replace(" ", "_");
-          res.attachment(`${title}.mp4`);
-          res.set("Access-Control-Expose-Headers", "Content-Disposition");
-          res.set("Content-Disposition", `attachment;  ${title}.mp3`);
-          // console.log(JSON.stringify(res.headers));
-          // console.log(res, "response");
-          // console.log(res.getHeaders(), "response");
-          res.download(`./${youtube_parser(videolink)}.mp3`, `${title}.mp3`);
-        });
+      // console.log("yes its audio", __dirname);
+      // ffmpeg("./" + youtube_parser(videolink) + ".mp4")
+      //   .audioBitrate(128)
+      //   .save(`./${youtube_parser(videolink)}.mp3`)
+      //   .on("progress", (p) => {
+      //     // readline.cursorTo(process.stdout, 0);
+      //     process.stdout.write(`${p.targetSize}kb downloaded`);
+      //   })
+      //   .on("end", () => {
+      //     console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
+      //     // fs.unlinkSync(`${__dirname}/playlists/${playlist}/${item.title}.mp4`);
+      //     console.log("converted to mp3");
+      //     // counter++;
+      //     // console.log(counter);
+      //     title.replace(" ", "_");
+      //     res.attachment(`${title}.mp4`);
+      //     res.set("Access-Control-Expose-Headers", "Content-Disposition");
+      //     res.set("Content-Disposition", `attachment;  ${title}.mp3`);
+      //     // console.log(JSON.stringify(res.headers));
+      //     // console.log(res, "response");
+      //     // console.log(res.getHeaders(), "response");
+      //     res.download(`./${youtube_parser(videolink)}.mp3`, `${title}.mp3`);
+      //   });
+      // yt.pipe(file);
+      title.replace(" ", "_");
+      res.attachment(`${title}.m4a`);
+      res.set("Access-Control-Expose-Headers", "Content-Disposition");
+      res.set("Content-Disposition", `attachment;  ${title}.m4a`);
+      // console.log(JSON.stringify(res.headers));
+      // console.log(res, "response");
+      // console.log(res.getHeaders(), "response");
+      res.download(filenames, `${title}.m4a`);
     } else {
       // yt.pipe(file);
       title.replace(" ", "_");
