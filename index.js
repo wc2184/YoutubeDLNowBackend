@@ -72,7 +72,7 @@ app.get("/audiotrial", (req, res) => {
   });
   //s
   // let options = { filter: "audioonly", format: "webm" };
-  let options = {};
+  let options = { filter: "audioandvideo", quality: "highest" };
 
   ytdl(videolink, options)
     .on("error", (err) => {
@@ -128,7 +128,7 @@ app.get("/download/:type", (req, res) => {
     return;
   });
   //s
-  let options = {};
+  let options = { filter: "audioandvideo", quality: "highest" };
   // if (req.params.type == "audio") {
   //   options = { filter: "audioonly" };
   //   console.log("ran the audio!");
@@ -201,7 +201,6 @@ app.get("/download/:type", (req, res) => {
       // let outputPath
       // if os.platform() ==
       ffmpeg(filenames)
-        .format("mp3")
         .output(`${__dirname}/${youtube_parser(videolink)}.mp3`) // CRUX, DIRNAME IS IMPORTANT
         .on("end", () => {
           res.download(
