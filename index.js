@@ -209,7 +209,9 @@ app.get("/download/:type", (req, res) => {
               console.log("Error in after res.download: ", err);
               console.log("Error done. ----");
             }
-
+            fs.readdirSync(__dirname).forEach((file) => {
+              console.log(file, "POST DL is a file--");
+            });
             fs.unlink(filenames, function () {
               console.log(`${filenames} has been deleted successfully.`);
             });
