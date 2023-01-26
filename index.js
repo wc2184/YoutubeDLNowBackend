@@ -192,6 +192,10 @@ app.get("/download/:type", (req, res) => {
       // console.log(JSON.stringify(res.headers));
       // console.log(res, "response");
       // console.log(res.getHeaders(), "response");
+      console.log(__dirname);
+      fs.readdirSync(__dirname).forEach((file) => {
+        console.log(file, "is a file--");
+      });
       ffmpeg(filenames)
         .format("mp3")
         .output(`${__dirname}\\${youtube_parser(videolink)}.mp3`) // CRUX, DIRNAME IS IMPORTANT
