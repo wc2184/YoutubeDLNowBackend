@@ -186,9 +186,9 @@ app.get("/download/:type", (req, res) => {
       //   });
       // yt.pipe(file);
       title.replace(" ", "_");
-      res.attachment(`${title}.m4a`);
+      res.attachment(`${title}.mp3`);
       res.set("Access-Control-Expose-Headers", "Content-Disposition");
-      res.set("Content-Disposition", contentDisposition(`${title}.m4a`));
+      res.set("Content-Disposition", contentDisposition(`${title}.mp3`));
       // res.set("Content-Disposition", `attachment;  ${title}.m4a`);
       // console.log(JSON.stringify(res.headers));
       // console.log(res, "response");
@@ -204,18 +204,29 @@ app.get("/download/:type", (req, res) => {
         .format("mp3")
         .output(`${__dirname}/${youtube_parser(videolink)}.mp3`) // CRUX, DIRNAME IS IMPORTANT
         .on("end", () => {
-          res.download(filenames, `${title}.m4a`, function (err) {
-            if (err) {
-              console.log("Error in after res.download: ", err);
-              console.log("Error done. ----");
+          res.download(
+            `${youtube_parser(videolink)}.mp3`,
+            `${title}.mp3`,
+            function (err) {
+              if (err) {
+                console.log("Error in after res.download: ", err);
+                console.log("Error done. ----");
+              }
+              fs.readdirSync(__dirname).forEach((file) => {
+                console.log(file, "POST DL is a file--");
+              });
+              fs.unlink(`${youtube_parser(videolink)}.mp3`, function () {
+                console.log(
+                  `${
+                    youtube_parser(videolink) + ".mp3"
+                  } has been deleted successfully.`
+                );
+              });
+              fs.unlink(filenames, function () {
+                console.log(`${filenames} has been deleted successfully.`);
+              });
             }
-            fs.readdirSync(__dirname).forEach((file) => {
-              console.log(file, "POST DL is a file--");
-            });
-            fs.unlink(filenames, function () {
-              console.log(`${filenames} has been deleted successfully.`);
-            });
-          });
+          );
         })
         .on("error", (err) => {
           console.log(err, "this is ffmpeg error");
