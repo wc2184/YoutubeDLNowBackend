@@ -13,12 +13,13 @@
   "license": "MIT",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "content-disposition": "^0.5.4",
     "cors": "^2.8.5",
     "downloads-folder": "^3.0.3",
     "express": "^4.18.1",
     "ffmpeg": "^0.0.4",
     "fluent-ffmpeg": "^2.1.2",
-    "ytdl-core": "^4.11.0",
+    "ytdl-core": "^4.11.2",
     "ytpl": "^2.3.0",
     "zip-local": "^0.3.5"
   },

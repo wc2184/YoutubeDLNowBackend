@@ -8,6 +8,8 @@ var zipper = require("zip-local");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
+var contentDisposition = require("content-disposition");
+const exec = require("child_process");
 
 const app = express();
 
@@ -185,21 +187,53 @@ app.get("/download/:type", (req, res) => {
       title.replace(" ", "_");
       res.attachment(`${title}.m4a`);
       res.set("Access-Control-Expose-Headers", "Content-Disposition");
-      res.set("Content-Disposition", `attachment;  ${title}.m4a`);
+      res.set("Content-Disposition", contentDisposition(`${title}.m4a`));
+      // res.set("Content-Disposition", `attachment;  ${title}.m4a`);
       // console.log(JSON.stringify(res.headers));
       // console.log(res, "response");
       // console.log(res.getHeaders(), "response");
-      res.download(filenames, `${title}.m4a`);
+      ffmpeg(filenames)
+        .format("mp3")
+        .output(`${__dirname}\\${youtube_parser(videolink)}.mp3`) // CRUX, DIRNAME IS IMPORTANT
+        .on("end", () => {
+          res.download(filenames, `${title}.m4a`, function (err) {
+            if (err) {
+              console.log("Error in after res.download: ", err);
+              console.log("Error done. ----");
+            }
+
+            fs.unlink(filenames, function () {
+              console.log(`${filenames} has been deleted successfully.`);
+            });
+          });
+        })
+        .on("error", (err) => {
+          console.log(err, "this is ffmpeg error");
+        })
+        .run();
+
+      // ffmpeg(filenames).output(`${videolink}.mp3`);
     } else {
       // yt.pipe(file);
+      console.log(filenames, "Filenames <-");
       title.replace(" ", "_");
       res.attachment(`${title}.mp4`);
       res.set("Access-Control-Expose-Headers", "Content-Disposition");
-      res.set("Content-Disposition", `attachment;  ${title}.mp4`);
+      // res.set("Content-Disposition", `attachment;  ${title}.mp4`);
+      res.set("Content-Disposition", contentDisposition(`${title}.mp4`));
       // console.log(JSON.stringify(res.headers));
       // console.log(res, "response");
       // console.log(res.getHeaders(), "response");
-      res.download(filenames, `${title}.mp4`);
+      res.download(filenames, `${title}.mp4`, function (err) {
+        if (err) {
+          console.log("Error in after res.download: ", err);
+          console.log("Error done. ----");
+        }
+
+        fs.unlink(filenames, function () {
+          console.log(`${filenames} has been deleted successfully.`);
+        });
+      });
     }
   });
   //   res.sendStatus(500);
