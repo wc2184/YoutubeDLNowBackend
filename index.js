@@ -1,5 +1,6 @@
 const express = require("express");
 const fs = require("fs");
+const os = require("os");
 const ytdl = require("ytdl-core");
 const downloadsFolder = require("downloads-folder");
 var cors = require("cors");
@@ -193,6 +194,7 @@ app.get("/download/:type", (req, res) => {
       // console.log(res, "response");
       // console.log(res.getHeaders(), "response");
       console.log(__dirname);
+      console.log(os.platform(), "is the platform");
       fs.readdirSync(__dirname).forEach((file) => {
         console.log(file, "is a file--");
       });
