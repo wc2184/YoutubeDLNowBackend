@@ -198,9 +198,11 @@ app.get("/download/:type", (req, res) => {
       fs.readdirSync(__dirname).forEach((file) => {
         console.log(file, "is a file--");
       });
+      // let outputPath
+      // if os.platform() ==
       ffmpeg(filenames)
         .format("mp3")
-        .output(`${__dirname}\\${youtube_parser(videolink)}.mp3`) // CRUX, DIRNAME IS IMPORTANT
+        .output(`${__dirname}/${youtube_parser(videolink)}.mp3`) // CRUX, DIRNAME IS IMPORTANT
         .on("end", () => {
           res.download(filenames, `${title}.m4a`, function (err) {
             if (err) {
