@@ -36,7 +36,7 @@ function youtube_parser(url) {
 }
 app.get("/", (req, res) => {
   res.send(
-    "You're using YoutubeDLNow's backend made by William Chan @ https://github.com/wc2184/YoutubeDLNowBackend"
+    "You're using YoutubeDLNow's backend made by William Chan located at https://github.com/wc2184/YoutubeDLNowBackend"
   );
 });
 
