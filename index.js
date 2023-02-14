@@ -2,9 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const os = require("os");
 const ytdl = require("ytdl-core");
-const downloadsFolder = require("downloads-folder");
 var cors = require("cors");
-const ytpl = require("ytpl");
 var zipper = require("zip-local");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
@@ -30,80 +28,12 @@ app.on("uncaughtException", function (req, res, route, err) {
 app.use(cors({ credentials: true, origin: true }));
 let PORT = process.env.PORT || 5000;
 
-// TypeScript: import ytdl from 'ytdl-core'; with --esModuleInterop
-// TypeScript: import * as ytdl from 'ytdl-core'; with --allowSyntheticDefaultImports
-// TypeScript: import ytdl = require('ytdl-core'); with neither of the above
-
-// ytdl("http://www.youtube.com/watch?v=aqz-KE-bpKQ").pipe(
-//   fs.createWriteStream("video.mp4")
-// );
-// app.get("/", (req, res) => {
-//   const user = req.query.user;
-//   res.send(user + "is what you typed");
-// });
 function youtube_parser(url) {
   var regExp =
     /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
   var match = url.match(regExp);
   return match && match[7].length == 11 ? match[7] : false;
 }
-
-app.get("/audiotrial", (req, res) => {
-  console.log("download rann");
-  console.log(req.params.type, "is the type");
-  let type = req.params.type;
-  let title;
-  let videolink = req.query.link;
-  if (!/(youtube.com|youtu.be)\/(watch)?(\?v=)?(\S+)?/.test(videolink)) {
-    console.log("Not a valid Youtube Link");
-    res.send(500).send({ ok: false });
-    return;
-  }
-
-  console.log(videolink, "this is the link");
-  let filenames = youtube_parser(videolink) + ".mp4";
-  let file = fs.createWriteStream(filenames);
-  file.on("error", function (err) {
-    console.log(err);
-    file.end();
-    console.log("Stopping your thing");
-    res.send(500).send({ ok: false });
-    return;
-  });
-  //s
-  // let options = { filter: "audioonly", format: "webm" };
-  let options = { filter: "audioandvideo", quality: "highest" };
-
-  ytdl(videolink, options)
-    .on("error", (err) => {
-      console.log(err, "caught da error");
-      console.log("end it now");
-      res.header("ok", "false");
-      res.sendStatus(500);
-      return;
-    })
-    .pipe(file);
-  ytdl
-    .getInfo(videolink)
-    .then((data) => {
-      console.log(data.videoDetails.title);
-      title = data.videoDetails.title;
-    })
-    .catch((err) => console.log(err, "in the get info error"));
-  //   http://localhost:5000/download?link=https://www.youtube.com/watch?v=AuO0Y8Iwq0E
-
-  //   console.log(downloadsFolder());
-  //   location = downloadsFolder();
-  file.on("finish", () => {
-    // fs.writeFile(location, file, function callback(err) {
-    //   if (err) throw err;
-    //   console.log(downloaded);
-    // });
-    // res.send("Downloaded!");
-
-    res.download(`./${youtube_parser(videolink)}.mp4`, `${title}.m4a`);
-  });
-});
 
 app.get("/download/:type", (req, res) => {
   console.log("download rann");
@@ -127,16 +57,13 @@ app.get("/download/:type", (req, res) => {
     res.send(500).send({ ok: false });
     return;
   });
-  //s
+
   let options = { filter: "audioandvideo", quality: "highest" };
-  // if (req.params.type == "audio") {
-  //   options = { filter: "audioonly" };
-  //   console.log("ran the audio!");
-  // }
+
   ytdl(videolink, options)
     .on("error", (err) => {
-      console.log(err, "caught da error");
-      console.log("end it now");
+      console.log(err, "This is the error.");
+      console.log("Ending script.");
       res.header("ok", "false");
       res.sendStatus(500);
       return;
@@ -149,57 +76,21 @@ app.get("/download/:type", (req, res) => {
       title = data.videoDetails.title;
     })
     .catch((err) => console.log(err, "in the get info error"));
-  //   http://localhost:5000/download?link=https://www.youtube.com/watch?v=AuO0Y8Iwq0E
 
-  //   console.log(downloadsFolder());
-  //   location = downloadsFolder();
   file.on("finish", () => {
-    // fs.writeFile(location, file, function callback(err) {
-    //   if (err) throw err;
-    //   console.log(downloaded);
-    // });
-    // res.send("Downloaded!");
     let start = Date.now();
     if (type == "audio") {
-      // console.log("yes its audio", __dirname);
-      // ffmpeg("./" + youtube_parser(videolink) + ".mp4")
-      //   .audioBitrate(128)
-      //   .save(`./${youtube_parser(videolink)}.mp3`)
-      //   .on("progress", (p) => {
-      //     // readline.cursorTo(process.stdout, 0);
-      //     process.stdout.write(`${p.targetSize}kb downloaded`);
-      //   })
-      //   .on("end", () => {
-      //     console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
-      //     // fs.unlinkSync(`${__dirname}/playlists/${playlist}/${item.title}.mp4`);
-      //     console.log("converted to mp3");
-      //     // counter++;
-      //     // console.log(counter);
-      //     title.replace(" ", "_");
-      //     res.attachment(`${title}.mp4`);
-      //     res.set("Access-Control-Expose-Headers", "Content-Disposition");
-      //     res.set("Content-Disposition", `attachment;  ${title}.mp3`);
-      //     // console.log(JSON.stringify(res.headers));
-      //     // console.log(res, "response");
-      //     // console.log(res.getHeaders(), "response");
-      //     res.download(`./${youtube_parser(videolink)}.mp3`, `${title}.mp3`);
-      //   });
-      // yt.pipe(file);
       title.replace(" ", "_");
       res.attachment(`${title}.mp3`);
       res.set("Access-Control-Expose-Headers", "Content-Disposition");
       res.set("Content-Disposition", contentDisposition(`${title}.mp3`));
-      // res.set("Content-Disposition", `attachment;  ${title}.m4a`);
-      // console.log(JSON.stringify(res.headers));
-      // console.log(res, "response");
-      // console.log(res.getHeaders(), "response");
+
       console.log(__dirname);
       console.log(os.platform(), "is the platform");
       fs.readdirSync(__dirname).forEach((file) => {
         console.log(file, "is a file--");
       });
-      // let outputPath
-      // if os.platform() ==
+
       ffmpeg(filenames)
         .output(`${__dirname}/${youtube_parser(videolink)}.mp3`) // CRUX, DIRNAME IS IMPORTANT
         .on("end", () => {
@@ -228,22 +119,17 @@ app.get("/download/:type", (req, res) => {
           );
         })
         .on("error", (err) => {
-          console.log(err, "this is ffmpeg error");
+          console.log(err, "This is ffmpeg error.");
         })
         .run();
-
-      // ffmpeg(filenames).output(`${videolink}.mp3`);
     } else {
-      // yt.pipe(file);
       console.log(filenames, "Filenames <-");
       title.replace(" ", "_");
       res.attachment(`${title}.mp4`);
       res.set("Access-Control-Expose-Headers", "Content-Disposition");
-      // res.set("Content-Disposition", `attachment;  ${title}.mp4`);
+
       res.set("Content-Disposition", contentDisposition(`${title}.mp4`));
-      // console.log(JSON.stringify(res.headers));
-      // console.log(res, "response");
-      // console.log(res.getHeaders(), "response");
+
       res.download(filenames, `${title}.mp4`, function (err) {
         if (err) {
           console.log("Error in after res.download: ", err);
@@ -256,155 +142,6 @@ app.get("/download/:type", (req, res) => {
       });
     }
   });
-  //   res.sendStatus(500);
-});
-// just make another api request with the playlist download, use react front end to parse the playlist
-// put everything into a file, and zip/compress that file
-
-app.get("/playlist/:type", (req, res) => {
-  console.log(req.query.link);
-  console.log(req.params.type);
-  let type = req.params.type;
-  // res.send(req.query.link);
-  let playlist = req.query.link.split("list=")[1];
-  console.log(playlist ? console.log("yes") : "undefinedddd daddy");
-  if (!playlist) return res.end();
-  console.log(playlist, "playlist");
-  ytpl(playlist)
-    .then(async (data) => {
-      // console.log(res.items);
-      await fs.mkdir(`${__dirname}/playlists/${playlist}`, (err) =>
-        console.log(err)
-      );
-
-      console.log(data.items.length);
-      let counter = 0;
-      data.items.forEach((item) => {
-        let file = fs.createWriteStream(
-          `${__dirname}/playlists/${playlist}/${item.title}.mp4`
-        );
-        console.log(item.title);
-        console.log(item.shortUrl);
-        console.log("-------");
-        let options = {};
-        if (req.params.type == "audio") {
-          options = { filter: "audioonly" };
-          console.log("ran the audio!");
-        }
-        let yt = ytdl(item.shortUrl, options).on("error", (err) => {
-          console.log(err, "caught da error");
-          console.log("end it now");
-          res.header("ok", "false");
-          res.sendStatus(500);
-          return;
-          //
-        });
-
-        // .pipe(file); // if video then add this
-        let start = Date.now();
-        if (type == "audio") {
-          console.log("yes its audio", __dirname);
-          ffmpeg(yt)
-            .audioBitrate(128)
-            .save(`${__dirname}/playlists/${playlist}/${item.title}.mp3`)
-            .on("progress", (p) => {
-              // readline.cursorTo(process.stdout, 0);
-              process.stdout.write(`${p.targetSize}kb downloaded`);
-            })
-            .on("end", () => {
-              console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
-              fs.unlinkSync(
-                `${__dirname}/playlists/${playlist}/${item.title}.mp4`
-              );
-              console.log("converted to mp3");
-              counter++;
-              console.log(counter);
-            });
-        } else {
-          yt.pipe(file);
-        }
-        file.on("finish", () => {
-          // res.set("Access-Control-Expose-Headers", "Content-Disposition");
-          // res.set("Content-Disposition", `attachment;  ${item.title}.mp4`);
-
-          // console.log(JSON.stringify(res.headers));
-          // console.log(res, "response");
-          // console.log(res.getHeaders(), "response");
-          console.log("staying in mp4");
-          counter++;
-          console.log(counter);
-          // if (type == "audio") {
-          //   console.log(
-          //     "yes its an audio now convertin, path is " +
-          //       `${__dirname}/playlists/${playlist}/${item.title}.mp4`
-          //   );
-          //   ffmpeg(`${__dirname}/playlists/${playlist}/${item.title}.mp4`)
-          //     .format("mp3")
-          //     .audioBitrate(128)
-          //     .on("end", () => {
-          //       console.log("converted to mp3");
-          //       counter++;
-          //       console.log(counter);
-          //     })
-          //     .on("err", (err) => {
-          //       console.log(err, "error conversion");
-          //     });
-          // }
-          // res.download(`./playlists/${playlist}/${item.title}.mp4`, (err) =>
-          //   console.log(err)
-          // );
-        });
-      });
-      const clear = setInterval(async () => {
-        console.log(counter, "from interval");
-        if (counter == data.items.length) {
-          clearInterval(clear);
-          console.log("done");
-          zipper.sync
-            .zip(`${__dirname}/playlists/${playlist}`)
-            .save(`${__dirname}/playlists/${playlist}.zip`);
-          setTimeout(() => {
-            res.download(
-              `${__dirname}/playlists/${playlist}.zip`,
-              "youtubefolder.zip",
-              function (err) {
-                if (err) {
-                  console.log("error here boys");
-                  res.end();
-                }
-                // fs.unlink(`./playlists/${playlist}.zip`);
-                console.log("done downloadin local");
-                return;
-              }
-            );
-          }, 2000);
-
-          // zipper.zip(`./playlists/${playlist}`, function (error, zipped) {
-          //   if (!error) {
-          //     // zipped.compress(); // compress before exporting
-
-          //     // var buff = zipped.memory(); // get the zipped file as a Buffer
-
-          //     // or save the zipped file to disk
-          //     zipped.save(`./playlists/${playlist}.zip`, function (error) {
-          //       if (!error) {
-          //         console.log("saved successfully !");
-          //         res.download(
-          //           `./playlists/${playlist}.zip`,
-          //           "youtubefolder.zip"
-          //         );
-          //       }
-          //     });
-          //   }
-          // });
-
-          // res.send("Done Downloading! Yay!");
-          // `./playlists/${playlist}`
-          // res.download(`./playlists/hamil`, "videofolder.mp4");
-        }
-      }, 1000);
-    })
-    .catch((err) => console.log(err, "err playlist"));
 });
 
 app.listen(PORT, () => {
