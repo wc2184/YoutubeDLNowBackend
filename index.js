@@ -34,6 +34,11 @@ function youtube_parser(url) {
   var match = url.match(regExp);
   return match && match[7].length == 11 ? match[7] : false;
 }
+app.get("/", (req, res) => {
+  res.send(
+    "You're using YoutubeDLNow's backend made by William Chan @ https://github.com/wc2184/YoutubeDLNowBackend"
+  );
+});
 
 app.get("/download/:type", (req, res) => {
   console.log("download rann");
