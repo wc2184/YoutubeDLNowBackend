@@ -1,14 +1,15 @@
 const express = require("express");
 const fs = require("fs");
 const os = require("os");
-const ytdl = require("ytdl-core");
+// const ytdl = require("ytdl-core"); // ytdl-core is broken as of July 22, 2024.
+const ytdl = require("@distube/ytdl-core");
 var cors = require("cors");
 var zipper = require("zip-local");
 const ffmpegPath = require("@ffmpeg-installer/ffmpeg").path;
 const ffmpeg = require("fluent-ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegPath);
 var contentDisposition = require("content-disposition");
-const exec = require("child_process");
+// const exec = require("child_process");
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.on("uncaughtException", function (req, res, route, err) {
 });
 
 app.use(cors({ credentials: true, origin: true }));
-let PORT = process.env.PORT || 5000;
+let PORT = process.env.PORT || 5001;
 
 function youtube_parser(url) {
   var regExp =
@@ -41,8 +42,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/download/:type", (req, res) => {
-  console.log("download rann");
-  console.log(req.params.type, "is the type");
+  console.log("Download has begun.");
+  console.log(req.params.type, "is the type.");
   let type = req.params.type;
   let title;
   let videolink = req.query.link;
@@ -52,7 +53,7 @@ app.get("/download/:type", (req, res) => {
     return;
   }
 
-  console.log(videolink, "this is the link");
+  console.log(videolink, "<< Youtube Link");
   let filenames = youtube_parser(videolink) + ".mp4";
   let file = fs.createWriteStream(filenames);
   file.on("error", function (err) {
